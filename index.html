@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Helios Watch Co. — Sales & Repair</title>
+  <meta name="description" content="Watch sales, servicing and quote requests. 3D UI, tabs for Sales, Repair and Requests." />
+  <style>
+    :root{
+      --bg:#0f1724; /* deep navy */
+      --card:#0b1220;
+      --accent:#ffd166; /* warm gold */
+      --muted:#94a3b8;
+      --glass: rgba(255,255,255,0.04);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: linear-gradient(180deg, #071028 0%, #07121b 40%, #05111b 100%);
+      color:#e6eef8;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:32px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:24px;
+    }
+
+    /* App shell */
+    .app{
+      width:min(1150px, 96vw);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:18px;
+      padding:22px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:20px;
+      perspective:1200px; /* 3D context for children */
+    }
+
+    /* Left card - branding and tabs */
+    .sidebar{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));
+      border-radius:14px;
+      padding:18px;
+      min-height:420px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      transform-style:preserve-3d;
+      backface-visibility:hidden;
+    }
+
+    .brand{
+      display:flex;gap:12px;align-items:center
+    }
+    .logo{
+      width:60px;height:60px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#ff9a00);
+      display:grid;place-items:center;color:#07111b;font-weight:700;font-size:20px;box-shadow:0 6px 20px rgba(255,209,102,0.12);
+      transform: translateZ(30px) rotateX(12deg);
+    }
+    h1{font-size:20px;margin:0}
+    p.lead{margin:0;color:var(--muted);font-size:13px}
+
+    /* Tabs */
+    .tabs{display:flex;gap:8px;margin-top:6px}
+    .tab{
+      padding:10px 12px;border-radius:10px;background:transparent;border:1px solid transparent;color:var(--muted);cursor:pointer;font-weight:600;
+      transition:all .22s ease;backface-visibility:hidden;transform: translateZ(20px);
+    }
+    .tab.active{background:linear-gradient(90deg, rgba(255,209,102,0.12), rgba(255,209,102,0.04));border-color: rgba(255,209,102,0.12);color:var(--accent)}
+
+    /* Quick stats / contact */
+    .meta{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+    .meta .item{display:flex;justify-content:space-between;color:var(--muted);font-size:13px}
+
+    /* CTA */
+    .cta{margin-top:auto;display:flex;gap:8px}
+    .btn{padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);cursor:pointer;color:inherit;font-weight:700}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),#ff9a00);color:#07111b;border:none}
+
+    /* Right area */
+    .content{
+      padding:18px;border-radius:14px;background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.004));
+      min-height:420px;overflow:hidden;position:relative;transform-style:preserve-3d;
+    }
+
+    /* Sales grid */
+    .grid{display:grid;grid-template-columns: repeat(auto-fill,minmax(220px,1fr));gap:18px}
+
+    .card{
+      height:300px;border-radius:12px;padding:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
+      box-shadow: 0 8px 20px rgba(2,6,23,0.6);display:flex;flex-direction:column;justify-content:space-between;transform-style:preserve-3d;transition:transform .18s ease, box-shadow .18s ease;
+      cursor:grab;
+    }
+
+    .card:hover{transform: translateY(-6px) rotateX(6deg) translateZ(30px);box-shadow:0 18px 40px rgba(2,6,23,0.8)}
+    .watch-visual{height:130px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.08));}
+    .watch-name{font-weight:700}
+    .price{font-weight:800;color:var(--accent)}
+    .card .actions{display:flex;gap:8px}
+    .small{font-size:13px;color:var(--muted)}
+
+    /* Repair list */
+    .services{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .service{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.006));border:1px solid rgba(255,255,255,0.02);display:flex;gap:10px;align-items:center}
+    .service svg{width:36px;height:36px;flex-shrink:0;transform: translateZ(20px)}
+
+    /* Requests */
+    .requests{display:flex;flex-direction:column;gap:10px}
+    .req{padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.015)}
+
+    /* form */
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+    input,textarea,select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+
+    /* small helpers */
+    .muted{color:var(--muted)}
+
+    /* 3D parallax background element */
+    .bg-orb{position:absolute;right:-120px;top:-80px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle at 30% 30%, rgba(255,209,102,0.06), transparent 30%), radial-gradient(circle at 70% 70%, rgba(255,255,255,0.02), transparent 25%);filter:blur(40px);pointer-events:none;transform:translateZ(-100px);}
+
+    /* responsive */
+    @media (max-width:900px){
+      .app{grid-template-columns:1fr;}
+      .sidebar{order:2}
+      .content{order:1}
+    }
+
+    /* tiny micro-interactions */
+    .badge{font-size:12px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03)}
+
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="brand">
+        <div class="logo">H</div>
+        <div>
+          <h1>Helios Watch Co.</h1>
+          <p class="lead">Sales • Servicing • Custom requests</p>
+        </div>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Main tabs">
+        <button class="tab active" role="tab" data-tab="sales" aria-selected="true">Sales</button>
+        <button class="tab" role="tab" data-tab="repair" aria-selected="false">Repair</button>
+        <button class="tab" role="tab" data-tab="requests" aria-selected="false">Requests</button>
+      </div>
+
+      <div class="meta">
+        <div class="item"><span class="muted">Open hours</span><strong>Mon–Sat, 10–18</strong></div>
+        <div class="item"><span class="muted">Avg repair time</span><strong>3–7 days</strong></div>
+        <div class="item"><span class="muted">Trusted</span><strong>12,482 customers</strong></div>
+      </div>
+
+      <div class="cta">
+        <button class="btn" id="contactBtn">Contact</button>
+        <button class="btn primary" id="requestQuote">Request Quote</button>
+      </div>
+    </aside>
+
+    <main class="content" id="content" tabindex="0">
+      <div class="bg-orb" aria-hidden="true"></div>
+
+      <!-- Sales pane -->
+      <section class="pane" id="sales" role="tabpanel">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div>
+            <h2 style="margin:0">Shop Watches</h2>
+            <p class="small muted" style="margin-top:6px">Curated mechanical and quartz watches with international shipping.</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="badge">Best sellers</div>
+            <div class="badge">New arrivals</div>
+          </div>
+        </div>
+
+        <div class="grid" id="productsGrid" aria-live="polite">
+          <!-- cards injected by JS -->
+        </div>
+      </section>
+
+      <!-- Repair pane -->
+      <section class="pane" id="repair" role="tabpanel" hidden>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div>
+            <h2 style="margin:0">Repair & Servicing</h2>
+            <p class="small muted" style="margin-top:6px">From battery swaps to full overhauls — expert certified watchmakers.</p>
+          </div>
+          <div class="badge">Book online</div>
+        </div>
+
+        <div class="services" id="services">
+          <div class="service">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7 4l4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 12h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="1.4"></circle></svg>
+            <div>
+              <strong>Full service</strong>
+              <div class="small muted">Cleaning, oiling, timing adjustment</div>
+            </div>
+          </div>
+
+          <div class="service">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12h18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 3v18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <div>
+              <strong>Battery & seals</strong>
+              <div class="small muted">Battery swap, pressure test, reseal</div>
+            </div>
+          </div>
+
+          <div class="service">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8 7v10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <div>
+              <strong>Crystal & strap</strong>
+              <div class="small muted">Refit, polish, and replacement</div>
+            </div>
+          </div>
+
+          <div class="service">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2l3 6 6 .5-5 3 2.5 6L12 16l-6.5 2.5L8 11 3 8.5 9 8 12 2z" stroke="currentColor" stroke-width="0.8" fill="rgba(255,255,255,0.02)"/></svg>
+            <div>
+              <strong>Restoration</strong>
+              <div class="small muted">Case refinish, dial repair, parts sourcing</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="margin-top:14px;display:grid;grid-template-columns:1fr 340px;gap:12px;align-items:start">
+          <div>
+            <h3 style="margin:0 0 8px 0">How it works</h3>
+            <ol class="muted" style="margin:0;padding-left:18px">
+              <li>Request quote or drop-in</li>
+              <li>We inspect & provide estimate</li>
+              <li>Approve repair — we service and return</li>
+            </ol>
+          </div>
+
+          <div style="background:rgba(255,255,255,0.02);padding:12px;border-radius:10px">
+            <h4 style="margin:0 0 8px 0">Quick appointment</h4>
+            <label for="apptName">Name</label>
+            <input id="apptName" placeholder="Full name" />
+            <label for="apptPhone" style="margin-top:8px">Phone</label>
+            <input id="apptPhone" placeholder="Phone or email" />
+            <label for="apptWhen" style="margin-top:8px">Preferred day</label>
+            <input id="apptWhen" placeholder="e.g. 2025-12-05" />
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn" id="apptCancel">Cancel</button>
+              <button class="btn primary" id="apptSubmit">Book</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Requests pane -->
+      <section class="pane" id="requests" role="tabpanel" hidden>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div>
+            <h2 style="margin:0">Requests & Quotes</h2>
+            <p class="small muted" style="margin-top:6px">Send us a request for custom work or a repair estimate.</p>
+          </div>
+          <div class="badge">Stored locally</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 360px;gap:12px;align-items:start">
+          <div>
+            <div class="requests" id="requestsList" aria-live="polite">
+              <!-- requests injected here -->
+            </div>
+          </div>
+
+          <aside style="background:rgba(255,255,255,0.02);padding:12px;border-radius:10px">
+            <h4 style="margin-top:0">New Request</h4>
+            <label for="rqName">Name</label>
+            <input id="rqName" placeholder="Your name" />
+            <label for="rqContact" style="margin-top:8px">Contact</label>
+            <input id="rqContact" placeholder="Email or phone" />
+            <label for="rqType" style="margin-top:8px">Type</label>
+            <select id="rqType"><option>Repair</option><option>Custom build</option><option>Part sourcing</option></select>
+            <label for="rqMsg" style="margin-top:8px">Message</label>
+            <textarea id="rqMsg" rows="4" placeholder="Describe what you need..."></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn" id="rqClear">Clear</button>
+              <button class="btn primary" id="rqSend">Send request</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // --- Data (sample products) ---
+    const products = [
+      {id:1,name:"Astel Diver 200m",desc:"Automatic, sapphire, 40mm stainless",price:489,tag:"Diver"},
+      {id:2,name:"Meridian Chrono",desc:"Chronograph, 42mm, exhibition caseback",price:799,tag:"Chrono"},
+      {id:3,name:"Nocturne Minimal",desc:"Quartz, thin case, leather strap",price:149,tag:"Classic"},
+      {id:4,name:"Orbit GMT",desc:"GMT complication, 39mm brushed",price:639,tag:"GMT"},
+      {id:5,name:"Atlas Pilot",desc:"Large crown, luminous, pilot style",price:359,tag:"Pilot"},
+      {id:6,name:"Cobalt Dress",desc:"Blue dial, applied indices, slim",price:299,tag:"Dress"}
+    ];
+
+    // --- Simple tab switching ---
+    const tabs = document.querySelectorAll('.tab');
+    const panes = document.querySelectorAll('.pane');
+    tabs.forEach(t=>t.addEventListener('click', ()=>{
+      tabs.forEach(x=>{x.classList.remove('active');x.setAttribute('aria-selected','false')});
+      t.classList.add('active');t.setAttribute('aria-selected','true');
+      const which = t.dataset.tab;
+      panes.forEach(p=>{p.hidden = p.id !== which});
+    }));
+
+    // --- Inject product cards ---
+    const grid = document.getElementById('productsGrid');
+    function createCard(p){
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.setAttribute('tabindex','0');
+      card.innerHTML = `
+        <div class="watch-visual" aria-hidden="true">
+          <svg width="120" height="120" viewBox="0 0 120 120"><defs><linearGradient id="g${p.id}" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.12"/><stop offset="1" stop-color="#000" stop-opacity="0.06"/></linearGradient></defs>
+            <circle cx="60" cy="60" r="46" fill="url(#g${p.id})" stroke="rgba(255,255,255,0.04)" stroke-width="2" />
+            <circle cx="60" cy="60" r="36" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="1.2" />
+            <rect x="56" y="22" width="8" height="12" rx="2" fill="rgba(255,209,102,0.9)" transform="rotate(30 60 60)" />
+          </svg>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:start;gap:10px">
+            <div>
+              <div class="watch-name">${p.name}</div>
+              <div class="small muted">${p.desc}</div>
+            </div>
+            <div class="price">$${p.price}</div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn">Details</button>
+          <button class="btn primary" data-buy="${p.id}">Buy</button>
+        </div>
+      `;
+
+      // 3D tilt effect per card
+      card.addEventListener('mousemove', (e)=>{
+        const r = card.getBoundingClientRect();
+        const cx = r.left + r.width/2;
+        const cy = r.top + r.height/2;
+        const dx = (e.clientX - cx) / (r.width/2);
+        const dy = (e.clientY - cy) / (r.height/2);
+        const tiltX = (-dy * 8).toFixed(2);
+        const tiltY = (dx * 10).toFixed(2);
+        const translateZ = 24;
+        card.style.transform = `translateY(-6px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateZ(${translateZ}px)`;
+      });
+      card.addEventListener('mouseleave', ()=>{card.style.transform = ''});
+
+      // simple buy interaction
+      card.querySelector('[data-buy]')?.addEventListener('click', ()=>{
+        alert(`Added ${p.name} — $${p.price} to cart (demo).`);
+      });
+
+      return card;
+    }
+
+    products.forEach(p=>grid.appendChild(createCard(p)));
+
+    // --- Simple request storage ---
+    const reqList = document.getElementById('requestsList');
+    const rqName = document.getElementById('rqName');
+    const rqContact = document.getElementById('rqContact');
+    const rqType = document.getElementById('rqType');
+    const rqMsg = document.getElementById('rqMsg');
+
+    function loadRequests(){
+      reqList.innerHTML='';
+      const data = JSON.parse(localStorage.getItem('helios_requests')||'[]').reverse();
+      if(!data.length){reqList.innerHTML = '<div class="muted">No requests yet — submit one from the form.</div>';return}
+      data.forEach((r,idx)=>{
+        const el = document.createElement('div');el.className='req';
+        el.innerHTML = `<strong>${r.name} <span class="small muted">(${r.type})</span></strong><div class="small muted">${r.contact}</div><div style="margin-top:6px">${escapeHtml(r.msg)}</div>`;
+        reqList.appendChild(el);
+      })
+    }
+    function saveRequest(){
+      const r = {name:rqName.value||'Anonymous',contact:rqContact.value||'—',type:rqType.value,msg:rqMsg.value||'—',created:Date.now()};
+      const current = JSON.parse(localStorage.getItem('helios_requests')||'[]');
+      current.push(r);localStorage.setItem('helios_requests', JSON.stringify(current));
+      loadRequests();
+      rqName.value='';rqContact.value='';rqType.value='Repair';rqMsg.value='';
+      alert('Request saved locally — in a real site this would be sent to the server.');
+    }
+    function escapeHtml(str){return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}
+
+    document.getElementById('rqSend').addEventListener('click', saveRequest);
+    document.getElementById('rqClear').addEventListener('click', ()=>{rqName.value='';rqContact.value='';rqMsg.value='';});
+
+    // appointment demo
+    document.getElementById('apptSubmit').addEventListener('click', ()=>{
+      const n = document.getElementById('apptName').value||'Visitor';
+      const c = document.getElementById('apptPhone').value||'—';
+      const when = document.getElementById('apptWhen').value||'—';
+      alert(`Thanks ${n}! We received your booking request for ${when}. We'll contact ${c}.`);
+    });
+    document.getElementById('apptCancel').addEventListener('click', ()=>{document.getElementById('apptName').value='';document.getElementById('apptPhone').value='';document.getElementById('apptWhen').value='';});
+
+    // contact & request quick actions
+    document.getElementById('contactBtn').addEventListener('click', ()=>{
+      alert('Call us: +44 20 7946 0958 — or email hello@helios.example (demo).');
+    });
+    document.getElementById('requestQuote').addEventListener('click', ()=>{
+      document.querySelector('.tab[data-tab="requests"]').click();
+      document.getElementById('rqName').focus();
+    });
+
+    // initial load requests
+    loadRequests();
+
+    // subtle 3D parallax for the whole app based on mouse
+    const app = document.getElementById('app');
+    document.addEventListener('mousemove', (e)=>{
+      const r = app.getBoundingClientRect();
+      const cx = r.left + r.width/2;
+      const cy = r.top + r.height/2;
+      const dx = (e.clientX - cx) / (r.width/2);
+      const dy = (e.clientY - cy) / (r.height/2);
+      app.style.transform = `rotateX(${(-dy*3).toFixed(2)}deg) rotateY(${(dx*3).toFixed(2)}deg)`;
+    });
+
+    // keyboard accessible tab switching (Left/Right)
+    const tabList = document.querySelector('[role=tablist]');
+    tabList.addEventListener('keydown', (e)=>{
+      const keys = ['ArrowLeft','ArrowRight','Home','End'];
+      if(!keys.includes(e.key)) return;
+      e.preventDefault();
+      const current = document.activeElement;
+      const items = Array.from(tabList.querySelectorAll('[role=tab]'));
+      let idx = items.indexOf(current);
+      if(e.key==='ArrowLeft') idx = (idx-1+items.length)%items.length;
+      if(e.key==='ArrowRight') idx = (idx+1)%items.length;
+      if(e.key==='Home') idx = 0;
+      if(e.key==='End') idx = items.length-1;
+      items[idx].focus();items[idx].click();
+    });
+
+    // small accessibility: focus outline style
+    document.addEventListener('keydown', (e)=>{document.documentElement.style.setProperty('--show-focus','1')}, {once:true});
+
+    // make sure panes have proper aria-hidden
+    function updateAria(){
+      panes.forEach(p=>{p.setAttribute('aria-hidden', p.hidden)});
+    }
+    const observer = new MutationObserver(updateAria);
+    panes.forEach(p=>observer.observe(p,{attributes:true,attributeFilter:['hidden']}));
+    updateAria();
+
+  </script>
+</body>
+</html>
