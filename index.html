@@ -6,7 +6,9 @@
   <title>Watch Finder — Example (Dark)</title>
   <meta name="color-scheme" content="dark light">
   <style>
-
+    /* ==========================
+       Dark theme variables & base
+       ========================== */
     :root{
       --bg:#0b0f12;
       --panel:#0f1417;
@@ -38,10 +40,12 @@
       -moz-osx-font-smoothing:grayscale;
     }
 
+    /* ====== layout container ====== */
     .container{max-width:var(--max-w);margin:0 auto;padding:1rem}
     a{color:inherit;text-decoration:none}
     button{font:inherit}
 
+    /* ========== Header ========== */
     .site-header{
       border-bottom:1px solid rgba(255,255,255,0.03);
       background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
@@ -58,13 +62,16 @@
     .search-toggle:focus{outline:var(--focus)}
     .region-select{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:.4rem;border-radius:10px;color:var(--muted)}
 
+    /* ====== Page top / breadcrumbs ====== */
     main{padding:1.25rem 0}
     .breadcrumbs{font-size:.9rem;color:var(--muted);margin-bottom:.5rem}
     .page-title{font-size:2rem;margin:0 0 1rem 0;letter-spacing:-0.2px}
 
+    /* ====== Finder grid ====== */
     .finder-grid{display:grid;grid-template-columns:300px 1fr;gap:var(--gap);align-items:start}
     @media (max-width:var(--break-md)){ .finder-grid{grid-template-columns:1fr} }
 
+    /* ===== Filters column ===== */
     .filters{
       background:linear-gradient(180deg, rgba(255,255,255,0.012), transparent);
       border:1px solid rgba(255,255,255,0.03);
@@ -91,6 +98,7 @@
     .filter-body input[type="checkbox"]{width:16px;height:16px;border-radius:4px}
     .count-badge{margin-left:auto;color:var(--muted);font-size:.85rem}
 
+    /* ===== Results column ===== */
     .results{
       min-height:200px;
       background:linear-gradient(180deg, rgba(255,255,255,0.006), transparent);
@@ -106,7 +114,8 @@
     .search-input{padding:.45rem .6rem;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--text)}
     select#sort{padding:.45rem .6rem;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--text)}
     .result-meta{color:var(--muted);font-size:.95rem;margin-bottom:.5rem}
-    
+
+    /* ===== Product grid/cards ===== */
     .product-grid{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
@@ -132,16 +141,20 @@
     .btn{padding:.45rem .6rem;border-radius:10px;border:0;background:transparent;color:var(--accent-2);cursor:pointer}
     .btn:focus{outline:var(--focus)}
 
+    /* ========== pagination ========== */
     .pagination{display:flex;gap:.6rem;align-items:center;justify-content:center;padding-top:1rem}
     .page-btn{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:.45rem .65rem;border-radius:10px;color:var(--muted);cursor:pointer}
     .page-info{color:var(--muted)}
 
+    /* ========== empty state & a11y ========== */
     .empty{padding:2rem;text-align:center;color:var(--muted)}
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
+    /* focus styles for keyboard */
     :focus{outline-offset:2px}
     a:focus, button:focus, input:focus, select:focus{outline:var(--focus);border-radius:8px}
 
+    /* small screens: toggle filters collapsed initially */
     @media (max-width:640px){
       .filters{order:2}
       .results{order:1}
@@ -149,6 +162,7 @@
       .filter-toggle[aria-expanded="true"] + .filter-body{display:block}
     }
 
+    /* subtle micro animation */
     .fade-up{transform-origin:center;opacity:0;transform:translateY(6px)}
     .fade-up.show{opacity:1;transform:none;transition:opacity 360ms var(--transition), transform 360ms var(--transition)}
     footer.site-footer{padding:1.25rem 0;color:var(--muted);text-align:center}
@@ -157,7 +171,7 @@
 <body>
   <header class="site-header" role="banner">
     <div class="container header-inner">
-     <a class="brand" href="/" aria-label="Seiko Watch Home">SEIKO WATCH</a>
+      <a class="brand" href="/" aria-label="Seiko Watch Home">SEIKO WATCH</a>
       <nav class="main-nav" aria-label="Main navigation">
         <ul>
           <li><a href="#collections">Collections</a></li>
@@ -178,11 +192,14 @@
   </header>
 
   <main class="container page-watchfinder" id="finder" role="main">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <ol><li><a href="/">SEIKO WATCH</a></li><li>Watch Finder</li></ol>
+    </nav>
 
     <h1 class="page-title">Watch Finder</h1>
 
     <div class="finder-grid" aria-live="polite">
-      
+      <!-- Filters (left column) -->
       <aside class="filters" id="filters" aria-label="Filters">
         <div class="controls">
           <h3>Refine results</h3>
@@ -194,10 +211,12 @@
         <form id="filters-form" aria-describedby="filters-desc">
           <div id="filters-desc" class="sr-only">Use these filters to narrow watch results. Counts update live.</div>
 
+          <!-- Search inside filters (name search) -->
           <div style="margin-bottom:.65rem">
             <input id="q" class="search-input" placeholder="Search model or collection" aria-label="Search models" />
           </div>
 
+          <!-- Category -->
           <div class="filter-group" data-filter="category">
             <button type="button" class="filter-toggle" aria-expanded="true">Category <span class="count-badge" data-group-count="category"></span></button>
             <div class="filter-body" role="group" aria-label="Category options">
@@ -208,6 +227,7 @@
             </div>
           </div>
 
+          <!-- Case material -->
           <div class="filter-group" data-filter="caseMaterial">
             <button type="button" class="filter-toggle" aria-expanded="true">Case material <span class="count-badge" data-group-count="caseMaterial"></span></button>
             <div class="filter-body" role="group" aria-label="Case material options">
@@ -217,6 +237,7 @@
             </div>
           </div>
 
+          <!-- Band material -->
           <div class="filter-group" data-filter="bandMaterial">
             <button type="button" class="filter-toggle" aria-expanded="true">Band material <span class="count-badge" data-group-count="bandMaterial"></span></button>
             <div class="filter-body" role="group" aria-label="Band material options">
@@ -226,6 +247,7 @@
             </div>
           </div>
 
+          <!-- Movement -->
           <div class="filter-group" data-filter="movement">
             <button type="button" class="filter-toggle" aria-expanded="true">Movement <span class="count-badge" data-group-count="movement"></span></button>
             <div class="filter-body" role="group" aria-label="Movement options">
@@ -235,6 +257,7 @@
             </div>
           </div>
 
+          <!-- Case size -->
           <div class="filter-group" data-filter="caseSize">
             <button type="button" class="filter-toggle" aria-expanded="true">Case size <span class="count-badge" data-group-count="caseSize"></span></button>
             <div class="filter-body" role="group" aria-label="Case size options">
@@ -248,6 +271,7 @@
         </form>
       </aside>
 
+      <!-- Results (right column) -->
       <section class="results" aria-live="polite">
         <div class="results-controls">
           <div class="controls-left">
@@ -276,6 +300,7 @@
         <div id="status" class="result-meta" aria-live="polite"></div>
 
         <div id="product-grid" class="product-grid" role="list" aria-label="Product results">
+          <!-- JS will render product cards here -->
         </div>
 
         <nav class="pagination" aria-label="Pagination">
@@ -290,10 +315,17 @@
   <footer class="site-footer" role="contentinfo">
     <div class="container">© 2025 Seiko Watch Corporation — demo</div>
   </footer>
+
+  <!-- ===========================
+       Inline app.js — single file
+       =========================== -->
   <script>
   (function(){
     'use strict';
-    
+
+    /* --------------------------
+       Sample product dataset
+       -------------------------- */
     const PRODUCTS = [
       { id: "S1", name: "Prospex Diver 200m", collection:"Prospex", category:"Divers", caseMaterial:"Stainless steel", bandMaterial:"Bracelet", movement:"Automatic", caseSize:44, price:760, image:svgDataUrl("Prospex Diver 200m","#0b4a6f","#071014"), url:"#"},
       { id: "S2", name: "Presage Cocktail Time", collection:"Presage", category:"Presage", caseMaterial:"Stainless steel", bandMaterial:"Leather", movement:"Automatic", caseSize:39, price:450, image:svgDataUrl("Presage Cocktail","#6a3b7a"), url:"#"},
@@ -312,6 +344,11 @@
       { id: "S15", name: "Deep Blue 44", collection:"Prospex", category:"Divers", caseMaterial:"Stainless steel", bandMaterial:"Rubber", movement:"Automatic", caseSize:44, price:980, image:svgDataUrl("Deep Blue","#023e6a"), url:"#"}
     ];
 
+    /* ---------------------------------------------------------
+       Utilities
+       - svgDataUrl: simple SVG placeholder generator (data URL)
+       - debounce: classic
+       --------------------------------------------------------- */
     function svgDataUrl(text, bg="#222", fg="#fff"){
       const w=800,h=600,esc = s => String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
       const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}' viewBox='0 0 ${w} ${h}'>
@@ -328,6 +365,9 @@
       return (...args)=>{ clearTimeout(t); t = setTimeout(()=>fn(...args), ms); };
     }
 
+    /* ------------------------
+       State & element refs
+       ------------------------ */
     let state = {
       all: PRODUCTS.slice(),
       filtered: [],
@@ -351,11 +391,19 @@
       clearAll: document.getElementById('clear-all')
     };
 
+    /* ------------------------
+       Init
+       ------------------------ */
     function init(){
+      // initial bind
       bindUI();
+      // parse URL state if present
       readURL();
+      // initial filter pass
       applyFilters();
+      // init counts UI
       updateAllCounts();
+      // make filter groups collapsible
       document.querySelectorAll('.filter-toggle').forEach(btn=>{
         btn.addEventListener('click', ()=>{
           const expanded = btn.getAttribute('aria-expanded') === 'true';
@@ -366,7 +414,11 @@
       });
     }
 
+    /* ------------------------
+       UI bindings
+       ------------------------ */
     function bindUI(){
+      // form interactions: checkboxes, selects
       DOM.form.addEventListener('change', debounce(e=>{
         if(e.target && e.target.name){
           state.page = 1;
@@ -382,12 +434,14 @@
       DOM.nextBtn.addEventListener('click', ()=>{ const max = Math.ceil(state.filtered.length/state.perPage); if(state.page<max){ state.page++; render(); scrollToTop(); }});
       DOM.clearAll.addEventListener('click', clearAllFilters);
 
+      // keyboard: enter on search toggles
       document.querySelector('.search-toggle').addEventListener('click', ()=>{
         const s = document.getElementById('q');
         s.focus();
         s.select();
       });
 
+      // allow clicking card to be keyboard friendly
       DOM.grid.addEventListener('keydown', (e)=>{
         if(e.key === 'Enter'){
           const a = e.target.closest('a');
@@ -395,9 +449,14 @@
         }
       });
 
+      // capture popstate to restore state
       window.addEventListener('popstate', (e)=>{ readURL(); applyFilters(false); });
     }
 
+    /* ------------------------
+       Filter logic
+       - reads form, filters dataset, sorts, paginates
+       ------------------------ */
     function getActiveFilters(){
       const fd = new FormData(DOM.form);
       const map = {};
@@ -405,6 +464,7 @@
         if(!map[k]) map[k]=new Set();
         map[k].add(v);
       }
+      // convert sets to arrays
       Object.keys(map).forEach(k=>map[k]=Array.from(map[k]));
       return map;
     }
@@ -412,7 +472,9 @@
     function applyFilters(pushURL = true){
       const filters = getActiveFilters();
       const q = state.q && state.q.toLowerCase();
+      // filter
       state.filtered = state.all.filter(p=>{
+        // search text
         if(q){
           const composite = `${p.name} ${p.collection} ${p.category}`.toLowerCase();
           if(!composite.includes(q)) return false;
@@ -420,25 +482,31 @@
         for(const key in filters){
           if(!filters[key].length) continue;
           const val = filters[key];
+          // caseSize in dataset is number — compare strings and numbers
           if(!val.some(v => String(p[key]) === String(v))) return false;
         }
         return true;
       });
 
+      // sort
       switch(state.sort){
         case 'priceasc': state.filtered.sort((a,b)=>a.price - b.price); break;
         case 'pricedesc': state.filtered.sort((a,b)=>b.price - a.price); break;
         case 'new': state.filtered.sort((a,b)=> (a.category=== 'New' ? -1 : 1)); break;
-        default: 
+        default: // relevance / default
           state.filtered.sort((a,b)=>a.name.localeCompare(b.name));
       }
 
+      // update counts and UI
       updateAllCounts();
       state.page = Math.min(state.page, Math.max(1, Math.ceil(state.filtered.length / state.perPage)));
       render();
       if(pushURL) pushStateToURL();
     }
 
+    /* ------------------------
+       Render UI
+       ------------------------ */
     function render(){
       DOM.grid.innerHTML = '';
       const total = state.filtered.length;
@@ -472,44 +540,55 @@
           frag.appendChild(item);
         });
         DOM.grid.appendChild(frag);
+        // lazy enhancement: observe images to unblur or show animation
+        // (Using loading="lazy" already)
       }
 
+      // pagination ui
       const pages = Math.max(1, Math.ceil(total / state.perPage));
       DOM.pageInfo.textContent = `Page ${state.page} of ${pages}`;
       DOM.prevBtn.disabled = state.page <= 1;
       DOM.nextBtn.disabled = state.page >= pages;
     }
 
+    /* ------------------------
+       Filter counts (live)
+       - show counts per option reflecting current base set (ignoring that option)
+       - also show group totals
+       ------------------------ */
     function updateAllCounts(){
-
+      // create counts from currently filtered base (but based on all products so users see availability)
+      // We'll show two layers: counts for option if it were applied on top of current query (helpful)
       const active = getActiveFilters();
       const q = state.q && state.q.toLowerCase();
 
-      
+      // helper that counts for a specific key:value applying other active filters but ignoring the inspected key itself
+      function countFor(key, value){
         return state.all.filter(p=>{
-         
+          // text filter still applied
           if(q){
             const composite = `${p.name} ${p.collection} ${p.category}`.toLowerCase();
             if(!composite.includes(q)) return false;
           }
           for(const k in active){
-            if(k === key) continue; 
+            if(k === key) continue; // ignore same group
             if(active[k].length && !active[k].includes(String(p[k]))) return false;
           }
-        
+          // now test the inspected option
           return String(p[key]) === String(value);
         }).length;
       }
 
-    
+      // update per-option counts
       document.querySelectorAll('[data-count-for]').forEach(el=>{
-        const keyval = el.getAttribute('data-count-for'); 
+        const keyval = el.getAttribute('data-count-for'); // e.g. caseMaterial:Stainless steel
         if(!keyval) return;
         const [k,v] = keyval.split(':');
         const c = countFor(k, v);
         el.textContent = c ? `(${c})` : '(0)';
       });
 
+      // update group totals (how many items would remain if ANY option in group selected)
       document.querySelectorAll('[data-group-count]').forEach(el=>{
         const key = el.getAttribute('data-group-count');
         const counts = Array.from(document.querySelectorAll(`[data-count-for^="${key}:"]`)).map(x=>{
@@ -522,22 +601,24 @@
       });
     }
 
- 
+    /* ------------------------
+       Helpers: clear filters, URL sync
+       ------------------------ */
     function clearAllFilters(){
-   
+      // uncheck all checkboxes, clear search, reset
       DOM.form.querySelectorAll('input[type="checkbox"]').forEach(cb=>cb.checked=false);
       DOM.q.value = '';
       state.q = '';
       state.page = 1;
       applyFilters();
-
+      // announce
       DOM.status.textContent = 'Filters cleared.';
       updateAllCounts();
     }
 
     function pushStateToURL(){
       const params = new URLSearchParams();
-
+      // collect selected filters
       const fd = new FormData(DOM.form);
       for(const [k,v] of fd.entries()){
         params.append(k,v);
@@ -552,34 +633,37 @@
 
     function readURL(){
       const params = new URLSearchParams(location.search);
-
+      // set checkboxes
       DOM.form.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
         const key = cb.name;
         const vals = params.getAll(key);
         cb.checked = vals.includes(cb.value);
       });
-
+      // q
       const q = params.get('q') || '';
       DOM.q.value = q;
       state.q = q;
-
+      // sort
       const sort = params.get('sort') || 'relevance';
       DOM.sort.value = sort;
       state.sort = sort;
-
+      // per
       const per = parseInt(params.get('per'),10) || 9;
       DOM.perPage.value = per;
       state.perPage = per;
-
+      // page
       const page = parseInt(params.get('page'),10) || 1;
       state.page = page;
     }
 
-
+    /* ------------------------
+       small utility functions
+       ------------------------ */
     function formatPrice(n){ return n ? '€' + n.toLocaleString() : '—'; }
     function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
     function scrollToTop(){ window.scrollTo({top: document.querySelector('.results').offsetTop - 20, behavior:'smooth'}); }
 
+    // initialize
     init();
 
   })();
