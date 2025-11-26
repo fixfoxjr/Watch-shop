@@ -1,11 +1,11 @@
+<!doctype html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Helios Watch Co. — Sales & Repair</title>
   <meta name="description" content="Watch sales, servicing and quote requests. 3D UI, tabs for Sales, Repair and Requests." />
-  <title>PrimeTime Watches — Sales & Repair</title>
   <style>
-    /* Modern Professional Styling */
     :root{
       --bg:#0f1724; /* deep navy */
       --card:#0b1220;
@@ -13,18 +13,10 @@
       --muted:#94a3b8;
       --glass: rgba(255,255,255,0.04);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      --bg:#0d0f13;
-      --panel:#14171d;
-      --card:#181c22;
-      --accent:#c8a96d;
-      --text:#e8ecf2;
-      --muted:#9aa3b5;
-      font-family: "Inter", system-ui, sans-serif;
     }
 
     *{box-sizing:border-box}
     html,body{height:100%}
-    *{box-sizing:border-box;margin:0;padding:0}
     body{
       margin:0;
       background: linear-gradient(180deg, #071028 0%, #07121b 40%, #05111b 100%);
@@ -32,9 +24,6 @@
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
       padding:32px;
-      background:var(--bg);
-      color:var(--text);
-      padding:40px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -48,27 +37,18 @@
       border-radius:18px;
       padding:22px;
       box-shadow: 0 10px 30px rgba(2,6,23,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
-    .container{
-      width:min(1200px,95%);
       display:grid;
       grid-template-columns: 360px 1fr;
       gap:20px;
       perspective:1200px; /* 3D context for children */
-      grid-template-columns:300px 1fr;
-      gap:30px;
-      perspective:1000px;
     }
 
     /* Left card - branding and tabs */
-    /* Sidebar */
     .sidebar{
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));
       border-radius:14px;
       padding:18px;
       min-height:420px;
-      background:var(--panel);
-      padding:24px;
-      border-radius:18px;
       display:flex;
       flex-direction:column;
       gap:14px;
@@ -78,39 +58,20 @@
 
     .brand{
       display:flex;gap:12px;align-items:center
-      gap:20px;
-      box-shadow:0 0 30px rgba(0,0,0,0.4);
     }
     .logo{
       width:60px;height:60px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#ff9a00);
       display:grid;place-items:center;color:#07111b;font-weight:700;font-size:20px;box-shadow:0 6px 20px rgba(255,209,102,0.12);
       transform: translateZ(30px) rotateX(12deg);
-      font-size:26px;
-      font-weight:800;
-      letter-spacing:1px;
     }
     h1{font-size:20px;margin:0}
     p.lead{margin:0;color:var(--muted);font-size:13px}
 
     /* Tabs */
     .tabs{display:flex;gap:8px;margin-top:6px}
-    .tabs{display:flex;flex-direction:column;gap:10px;margin-top:10px;}
     .tab{
       padding:10px 12px;border-radius:10px;background:transparent;border:1px solid transparent;color:var(--muted);cursor:pointer;font-weight:600;
       transition:all .22s ease;backface-visibility:hidden;transform: translateZ(20px);
-      padding:12px 14px;
-      border-radius:10px;
-      background:var(--card);
-      color:var(--muted);
-      font-weight:600;
-      border:1px solid transparent;
-      cursor:pointer;
-      transition:.25s;
-    }
-    .tab.active{
-      background:linear-gradient(90deg,var(--accent),#8c774b);
-      color:#000;
-      border-color:rgba(255,255,255,0.1);
     }
     .tab.active{background:linear-gradient(90deg, rgba(255,209,102,0.12), rgba(255,209,102,0.04));border-color: rgba(255,209,102,0.12);color:var(--accent)}
 
@@ -124,21 +85,10 @@
     .btn.primary{background:linear-gradient(90deg,var(--accent),#ff9a00);color:#07111b;border:none}
 
     /* Right area */
-    /* Main Content */
     .content{
       padding:18px;border-radius:14px;background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.004));
       min-height:420px;overflow:hidden;position:relative;transform-style:preserve-3d;
-      background:var(--panel);
-      padding:30px;
-      border-radius:18px;
-      position:relative;
-      overflow:hidden;
-      min-height:500px;
-      box-shadow:0 0 30px rgba(0,0,0,0.4);
     }
-    .pane{display:none;}
-    .pane.active{display:block;animation:fade .5s ease;}
-    @keyframes fade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
 
     /* Sales grid */
     .grid{display:grid;grid-template-columns: repeat(auto-fill,minmax(220px,1fr));gap:18px}
@@ -147,12 +97,6 @@
       height:300px;border-radius:12px;padding:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
       box-shadow: 0 8px 20px rgba(2,6,23,0.6);display:flex;flex-direction:column;justify-content:space-between;transform-style:preserve-3d;transition:transform .18s ease, box-shadow .18s ease;
       cursor:grab;
-    /* Sales Grid */
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
-      gap:20px;
-      margin-top:20px;
     }
 
     .card:hover{transform: translateY(-6px) rotateX(6deg) translateZ(30px);box-shadow:0 18px 40px rgba(2,6,23,0.8)}
@@ -186,12 +130,6 @@
       .app{grid-template-columns:1fr;}
       .sidebar{order:2}
       .content{order:1}
-    .product{
-      background:var(--card);
-      padding:20px;
-      border-radius:14px;
-      transition:transform .3s, box-shadow .3s;
-      cursor:pointer;
     }
 
     /* tiny micro-interactions */
@@ -428,12 +366,7 @@
       });
 
       return card;
-    .product:hover{
-      transform:translateY(-5px) scale(1.02);
-      box-shadow:0 10px 25px rgba(0,0,0,0.45);
     }
-    .product h3{margin-bottom:6px;font-size:17px;}
-    .price{color:var(--accent);font-weight:700;margin-top:6px;}
 
     products.forEach(p=>grid.appendChild(createCard(p)));
 
@@ -443,14 +376,6 @@
     const rqContact = document.getElementById('rqContact');
     const rqType = document.getElementById('rqType');
     const rqMsg = document.getElementById('rqMsg');
-    /* Services */
-    .service{
-      background:var(--card);
-      padding:18px;
-      border-radius:14px;
-      margin-bottom:15px;
-      border-left:4px solid var(--accent);
-    }
 
     function loadRequests(){
       reqList.innerHTML='';
@@ -461,12 +386,6 @@
         el.innerHTML = `<strong>${r.name} <span class="small muted">(${r.type})</span></strong><div class="small muted">${r.contact}</div><div style="margin-top:6px">${escapeHtml(r.msg)}</div>`;
         reqList.appendChild(el);
       })
-    /* Request Form */
-    label{font-size:14px;color:var(--muted)}
-    input,textarea,select{
-      width:100%;padding:10px;border-radius:8px;
-      background:#101216;border:1px solid #2a2e36;
-      color:var(--text);margin-top:6px;margin-bottom:14px;
     }
     function saveRequest(){
       const r = {name:rqName.value||'Anonymous',contact:rqContact.value||'—',type:rqType.value,msg:rqMsg.value||'—',created:Date.now()};
@@ -475,14 +394,6 @@
       loadRequests();
       rqName.value='';rqContact.value='';rqType.value='Repair';rqMsg.value='';
       alert('Request saved locally — in a real site this would be sent to the server.');
-    button{
-      background:var(--accent);
-      border:none;
-      padding:12px 16px;
-      border-radius:10px;
-      font-weight:700;
-      cursor:pointer;
-      transition:.2s;
     }
     function escapeHtml(str){return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}
 
@@ -520,9 +431,6 @@
       const dy = (e.clientY - cy) / (r.height/2);
       app.style.transform = `rotateX(${(-dy*3).toFixed(2)}deg) rotateY(${(dx*3).toFixed(2)}deg)`;
     });
-    button:hover{filter:brightness(.9);}
-  </style>
-</head>
 
     // keyboard accessible tab switching (Left/Right)
     const tabList = document.querySelector('[role=tablist]');
@@ -538,81 +446,6 @@
       if(e.key==='Home') idx = 0;
       if(e.key==='End') idx = items.length-1;
       items[idx].focus();items[idx].click();
-<body>
-<div class="container">
-
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="logo">PRIMETIME WATCHES</div>
-
-    <div class="tabs">
-      <button class="tab active" data-tab="sales">Sales</button>
-      <button class="tab" data-tab="repair">Repair</button>
-      <button class="tab" data-tab="requests">Requests</button>
-    </div>
-  </aside>
-
-  <!-- Main Content -->
-  <main class="content">
-
-    <!-- SALES -->
-    <section id="sales" class="pane active">
-      <h2>Watch Sales</h2>
-      <p>Premium curated watches with international warranty.</p>
-
-      <div class="grid" id="salesGrid"></div>
-    </section>
-
-    <!-- REPAIR -->
-    <section id="repair" class="pane">
-      <h2>Watch Repair</h2>
-      <p>Certified technicians. Fast turnaround. OEM parts.</p>
-
-      <div class="service"><strong>Full Servicing</strong><br><span style="color:var(--muted)">Overhaul, cleaning, lubrication</span></div>
-      <div class="service"><strong>Battery Replacement</strong><br><span style="color:var(--muted)">Same-day service</span></div>
-      <div class="service"><strong>Water Resistance Test</strong><br><span style="color:var(--muted)">Pressure testing and re-seal</span></div>
-      <div class="service"><strong>Crystal / Strap Replacement</strong><br><span style="color:var(--muted)">All models supported</span></div>
-    </section>
-
-    <!-- REQUESTS -->
-    <section id="requests" class="pane">
-      <h2>Custom Requests</h2>
-      <p>Get a quote for repair, restoration or custom builds.</p>
-
-      <label>Name</label>
-      <input id="reqName" placeholder="Your name" />
-
-      <label>Contact</label>
-      <input id="reqContact" placeholder="Email or phone" />
-
-      <label>Request Type</label>
-      <select id="reqType">
-        <option>Repair</option>
-        <option>Custom build</option>
-        <option>Restoration</option>
-      </select>
-
-      <label>Message</label>
-      <textarea id="reqMsg" rows="4" placeholder="Describe your request..."></textarea>
-
-      <button id="sendReq">Send Request</button>
-    </section>
-
-  </main>
-</div>
-
-<script>
-  /* TAB SWITCHING */
-  const tabs = document.querySelectorAll('.tab');
-  const panes = document.querySelectorAll('.pane');
-
-  tabs.forEach(tab=>{
-    tab.addEventListener('click',()=>{
-      tabs.forEach(t=>t.classList.remove('active'));
-      panes.forEach(p=>p.classList.remove('active'));
-
-      tab.classList.add('active');
-      document.getElementById(tab.dataset.tab).classList.add('active');
     });
 
     // small accessibility: focus outline style
@@ -627,32 +460,5 @@
     updateAria();
 
   </script>
-  });
-
-  /* SAMPLE PRODUCTS */
-  const products = [
-    {name:"Apex Diver 300m",price:520},
-    {name:"Lumin Chronograph",price:780},
-    {name:"Carbon Minimalist",price:210},
-    {name:"Voyager GMT",price:640},
-    {name:"Heritage Pilot",price:390},
-    {name:"Royal Dress Automatic",price:310}
-  ];
-
-  const grid = document.getElementById('salesGrid');
-  products.forEach(p=>{
-    const el = document.createElement('div');
-    el.className = 'product';
-    el.innerHTML = `<h3>${p.name}</h3><div class='price'>$${p.price}</div>`;
-    grid.appendChild(el);
-  });
-
-  /* REQUEST SUBMISSION */
-  document.getElementById('sendReq').addEventListener('click',()=>{
-    const name = reqName.value || "Anonymous";
-    alert(`Thank you ${name}, your request has been received.`);
-    reqName.value = reqContact.value = reqMsg.value = "";
-  });
-</script>
 </body>
 </html>
