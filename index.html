@@ -2,463 +2,671 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Helios Watch Co. — Sales & Repair</title>
-  <meta name="description" content="Watch sales, servicing and quote requests. 3D UI, tabs for Sales, Repair and Requests." />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Watch Finder — Example (Dark)</title>
+  <meta name="color-scheme" content="dark light">
   <style>
+    /* ==========================
+       Dark theme variables & base
+       ========================== */
     :root{
-      --bg:#0f1724; /* deep navy */
-      --card:#0b1220;
-      --accent:#ffd166; /* warm gold */
-      --muted:#94a3b8;
-      --glass: rgba(255,255,255,0.04);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      --bg:#0b0f12;
+      --panel:#0f1417;
+      --muted:#9aa4ad;
+      --text:#e6eef3;
+      --accent:#0ea5c9;
+      --accent-2:#6dd3ff;
+      --glass: rgba(255,255,255,0.03);
+      --card-shadow: 0 8px 30px rgba(2,6,12,0.6);
+      --radius:12px;
+      --gap:1rem;
+      --max-w:1200px;
+      --break-md:900px;
+      --break-sm:640px;
+      --focus: 3px solid rgba(14,165,201,0.18);
+      --transition: 220ms cubic-bezier(.2,.9,.3,1);
+      --reader: 14px/1.4 "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
     }
 
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
-      background: linear-gradient(180deg, #071028 0%, #07121b 40%, #05111b 100%);
-      color:#e6eef8;
+      background:radial-gradient(1200px 600px at 10% 10%, rgba(14,165,201,0.03), transparent 8%),
+                 linear-gradient(180deg,#071014 0%, var(--bg) 50%);
+      color:var(--text);
+      font:var(--reader);
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
-      padding:32px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:24px;
     }
 
-    /* App shell */
-    .app{
-      width:min(1150px, 96vw);
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:18px;
-      padding:22px;
-      box-shadow: 0 10px 30px rgba(2,6,23,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
+    /* ====== layout container ====== */
+    .container{max-width:var(--max-w);margin:0 auto;padding:1rem}
+    a{color:inherit;text-decoration:none}
+    button{font:inherit}
+
+    /* ========== Header ========== */
+    .site-header{
+      border-bottom:1px solid rgba(255,255,255,0.03);
+      background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+      position:sticky; top:0; z-index:50; backdrop-filter: blur(4px);
+    }
+    .header-inner{display:flex;align-items:center;gap:1rem;justify-content:space-between;padding:.75rem 0}
+    .brand{font-weight:700;letter-spacing:1px}
+    .main-nav ul{display:flex;gap:1rem;list-style:none;padding:0;margin:0}
+    .main-nav a{padding:.45rem .6rem;border-radius:8px;color:var(--muted)}
+    .main-nav a.active, .main-nav a:hover{color:var(--accent-2);background:rgba(255,255,255,0.02)}
+
+    .header-actions{display:flex;gap:.5rem;align-items:center}
+    .search-toggle{background:transparent;border:1px solid rgba(255,255,255,0.04); padding:.45rem .6rem;border-radius:10px;color:var(--muted);cursor:pointer}
+    .search-toggle:focus{outline:var(--focus)}
+    .region-select{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:.4rem;border-radius:10px;color:var(--muted)}
+
+    /* ====== Page top / breadcrumbs ====== */
+    main{padding:1.25rem 0}
+    .breadcrumbs{font-size:.9rem;color:var(--muted);margin-bottom:.5rem}
+    .page-title{font-size:2rem;margin:0 0 1rem 0;letter-spacing:-0.2px}
+
+    /* ====== Finder grid ====== */
+    .finder-grid{display:grid;grid-template-columns:300px 1fr;gap:var(--gap);align-items:start}
+    @media (max-width:var(--break-md)){ .finder-grid{grid-template-columns:1fr} }
+
+    /* ===== Filters column ===== */
+    .filters{
+      background:linear-gradient(180deg, rgba(255,255,255,0.012), transparent);
+      border:1px solid rgba(255,255,255,0.03);
+      padding:1rem;border-radius:var(--radius);
+      position:relative;
+    }
+    @media (min-width:901px){
+      .filters{position:sticky;top:1rem;align-self:start}
+    }
+    .filters h3{margin:.25rem 0 .5rem 0;font-size:1rem;color:var(--text)}
+    .filters .controls{display:flex;gap:.5rem;align-items:center;margin-bottom:.75rem}
+    .clear-filters{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:.4rem .6rem;border-radius:10px;color:var(--muted);cursor:pointer}
+    .clear-filters:focus{outline:var(--focus)}
+
+    .filter-group{border-top:1px solid rgba(255,255,255,0.02);padding-top:.6rem;margin-top:.6rem}
+    .filter-toggle{
+      display:flex;justify-content:space-between;align-items:center;width:100%;
+      background:transparent;border:0;padding:.35rem 0;color:var(--accent-2);font-weight:600;cursor:pointer;
+    }
+    .filter-body{margin-top:.5rem;padding-left:.25rem;display:block}
+    .filter-body label{
+      display:flex;align-items:center;gap:.6rem;padding:.35rem 0;color:var(--muted);cursor:pointer;
+    }
+    .filter-body input[type="checkbox"]{width:16px;height:16px;border-radius:4px}
+    .count-badge{margin-left:auto;color:var(--muted);font-size:.85rem}
+
+    /* ===== Results column ===== */
+    .results{
+      min-height:200px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.006), transparent);
+      border:1px solid rgba(255,255,255,0.03);
+      padding:1rem;border-radius:var(--radius);
+    }
+    .results-controls{
+      display:flex;gap:.75rem;align-items:center;justify-content:space-between;margin-bottom:1rem;
+      flex-wrap:wrap;
+    }
+    .controls-left{display:flex;gap:.6rem;align-items:center}
+    .view-count{display:flex;align-items:center;gap:.4rem;color:var(--muted)}
+    .search-input{padding:.45rem .6rem;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--text)}
+    select#sort{padding:.45rem .6rem;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--text)}
+    .result-meta{color:var(--muted);font-size:.95rem;margin-bottom:.5rem}
+
+    /* ===== Product grid/cards ===== */
+    .product-grid{
       display:grid;
-      grid-template-columns: 360px 1fr;
-      gap:20px;
-      perspective:1200px; /* 3D context for children */
+      grid-template-columns: repeat(3, 1fr);
+      gap:1rem;
+    }
+    @media (max-width:900px){ .product-grid{grid-template-columns: repeat(2, 1fr)} }
+    @media (max-width:600px){ .product-grid{grid-template-columns: 1fr} }
+
+    .product-card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+      border-radius:12px;overflow:hidden;box-shadow:var(--card-shadow);display:flex;flex-direction:column;transition:transform var(--transition), box-shadow var(--transition);
+      border:1px solid rgba(255,255,255,0.02);
+    }
+    .product-card:focus-within, .product-card:hover{ transform: translateY(-6px); box-shadow: 0 20px 50px rgba(2,6,12,0.7) }
+    .thumb{display:block;position:relative;aspect-ratio:4/3; overflow:hidden}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:contrast(1.03) saturate(1.05)}
+    .meta{padding:.75rem .85rem .9rem .85rem;display:flex;flex-direction:column;gap:.25rem}
+    .meta .label{font-size:.8rem;color:var(--muted)}
+    .meta .title{font-weight:600;letter-spacing:-0.2px}
+    .meta .price{margin-top:auto;font-weight:700;color:var(--accent-2)}
+
+    .card-actions{display:flex;gap:.5rem;padding:.6rem;border-top:1px solid rgba(255,255,255,0.02);background:linear-gradient(180deg, rgba(255,255,255,0.005), transparent)}
+    .btn{padding:.45rem .6rem;border-radius:10px;border:0;background:transparent;color:var(--accent-2);cursor:pointer}
+    .btn:focus{outline:var(--focus)}
+
+    /* ========== pagination ========== */
+    .pagination{display:flex;gap:.6rem;align-items:center;justify-content:center;padding-top:1rem}
+    .page-btn{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:.45rem .65rem;border-radius:10px;color:var(--muted);cursor:pointer}
+    .page-info{color:var(--muted)}
+
+    /* ========== empty state & a11y ========== */
+    .empty{padding:2rem;text-align:center;color:var(--muted)}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+    /* focus styles for keyboard */
+    :focus{outline-offset:2px}
+    a:focus, button:focus, input:focus, select:focus{outline:var(--focus);border-radius:8px}
+
+    /* small screens: toggle filters collapsed initially */
+    @media (max-width:640px){
+      .filters{order:2}
+      .results{order:1}
+      .filter-body{display:none}
+      .filter-toggle[aria-expanded="true"] + .filter-body{display:block}
     }
 
-    /* Left card - branding and tabs */
-    .sidebar{
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));
-      border-radius:14px;
-      padding:18px;
-      min-height:420px;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-      transform-style:preserve-3d;
-      backface-visibility:hidden;
-    }
-
-    .brand{
-      display:flex;gap:12px;align-items:center
-    }
-    .logo{
-      width:60px;height:60px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#ff9a00);
-      display:grid;place-items:center;color:#07111b;font-weight:700;font-size:20px;box-shadow:0 6px 20px rgba(255,209,102,0.12);
-      transform: translateZ(30px) rotateX(12deg);
-    }
-    h1{font-size:20px;margin:0}
-    p.lead{margin:0;color:var(--muted);font-size:13px}
-
-    /* Tabs */
-    .tabs{display:flex;gap:8px;margin-top:6px}
-    .tab{
-      padding:10px 12px;border-radius:10px;background:transparent;border:1px solid transparent;color:var(--muted);cursor:pointer;font-weight:600;
-      transition:all .22s ease;backface-visibility:hidden;transform: translateZ(20px);
-    }
-    .tab.active{background:linear-gradient(90deg, rgba(255,209,102,0.12), rgba(255,209,102,0.04));border-color: rgba(255,209,102,0.12);color:var(--accent)}
-
-    /* Quick stats / contact */
-    .meta{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-    .meta .item{display:flex;justify-content:space-between;color:var(--muted);font-size:13px}
-
-    /* CTA */
-    .cta{margin-top:auto;display:flex;gap:8px}
-    .btn{padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);cursor:pointer;color:inherit;font-weight:700}
-    .btn.primary{background:linear-gradient(90deg,var(--accent),#ff9a00);color:#07111b;border:none}
-
-    /* Right area */
-    .content{
-      padding:18px;border-radius:14px;background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.004));
-      min-height:420px;overflow:hidden;position:relative;transform-style:preserve-3d;
-    }
-
-    /* Sales grid */
-    .grid{display:grid;grid-template-columns: repeat(auto-fill,minmax(220px,1fr));gap:18px}
-
-    .card{
-      height:300px;border-radius:12px;padding:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
-      box-shadow: 0 8px 20px rgba(2,6,23,0.6);display:flex;flex-direction:column;justify-content:space-between;transform-style:preserve-3d;transition:transform .18s ease, box-shadow .18s ease;
-      cursor:grab;
-    }
-
-    .card:hover{transform: translateY(-6px) rotateX(6deg) translateZ(30px);box-shadow:0 18px 40px rgba(2,6,23,0.8)}
-    .watch-visual{height:130px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.08));}
-    .watch-name{font-weight:700}
-    .price{font-weight:800;color:var(--accent)}
-    .card .actions{display:flex;gap:8px}
-    .small{font-size:13px;color:var(--muted)}
-
-    /* Repair list */
-    .services{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .service{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.006));border:1px solid rgba(255,255,255,0.02);display:flex;gap:10px;align-items:center}
-    .service svg{width:36px;height:36px;flex-shrink:0;transform: translateZ(20px)}
-
-    /* Requests */
-    .requests{display:flex;flex-direction:column;gap:10px}
-    .req{padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.015)}
-
-    /* form */
-    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
-    input,textarea,select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
-
-    /* small helpers */
-    .muted{color:var(--muted)}
-
-    /* 3D parallax background element */
-    .bg-orb{position:absolute;right:-120px;top:-80px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle at 30% 30%, rgba(255,209,102,0.06), transparent 30%), radial-gradient(circle at 70% 70%, rgba(255,255,255,0.02), transparent 25%);filter:blur(40px);pointer-events:none;transform:translateZ(-100px);}
-
-    /* responsive */
-    @media (max-width:900px){
-      .app{grid-template-columns:1fr;}
-      .sidebar{order:2}
-      .content{order:1}
-    }
-
-    /* tiny micro-interactions */
-    .badge{font-size:12px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03)}
-
+    /* subtle micro animation */
+    .fade-up{transform-origin:center;opacity:0;transform:translateY(6px)}
+    .fade-up.show{opacity:1;transform:none;transition:opacity 360ms var(--transition), transform 360ms var(--transition)}
+    footer.site-footer{padding:1.25rem 0;color:var(--muted);text-align:center}
   </style>
 </head>
 <body>
-  <div class="app" id="app">
-    <aside class="sidebar" aria-label="Sidebar">
-      <div class="brand">
-        <div class="logo">H</div>
-        <div>
-          <h1>Helios Watch Co.</h1>
-          <p class="lead">Sales • Servicing • Custom requests</p>
+  <header class="site-header" role="banner">
+    <div class="container header-inner">
+      <a class="brand" href="/" aria-label="Seiko Watch Home">SEIKO WATCH</a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <ul>
+          <li><a href="#collections">Collections</a></li>
+          <li><a href="#finder" class="active">Watch Finder</a></li>
+          <li><a href="#company">Company</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions" role="group" aria-label="Header actions">
+        <button class="search-toggle" aria-expanded="false" aria-controls="global-search">🔍 Search</button>
+        <select class="region-select" aria-label="Select Region">
+          <option value="no">Norge</option>
+          <option value="se">Sverige</option>
+          <option value="fi">Suomi</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page-watchfinder" id="finder" role="main">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <ol><li><a href="/">SEIKO WATCH</a></li><li>Watch Finder</li></ol>
+    </nav>
+
+    <h1 class="page-title">Watch Finder</h1>
+
+    <div class="finder-grid" aria-live="polite">
+      <!-- Filters (left column) -->
+      <aside class="filters" id="filters" aria-label="Filters">
+        <div class="controls">
+          <h3>Refine results</h3>
+          <div style="margin-left:auto">
+            <button id="clear-all" class="clear-filters" title="Clear all filters">Clear</button>
+          </div>
         </div>
-      </div>
 
-      <div class="tabs" role="tablist" aria-label="Main tabs">
-        <button class="tab active" role="tab" data-tab="sales" aria-selected="true">Sales</button>
-        <button class="tab" role="tab" data-tab="repair" aria-selected="false">Repair</button>
-        <button class="tab" role="tab" data-tab="requests" aria-selected="false">Requests</button>
-      </div>
+        <form id="filters-form" aria-describedby="filters-desc">
+          <div id="filters-desc" class="sr-only">Use these filters to narrow watch results. Counts update live.</div>
 
-      <div class="meta">
-        <div class="item"><span class="muted">Open hours</span><strong>Mon–Sat, 10–18</strong></div>
-        <div class="item"><span class="muted">Avg repair time</span><strong>3–7 days</strong></div>
-        <div class="item"><span class="muted">Trusted</span><strong>12,482 customers</strong></div>
-      </div>
+          <!-- Search inside filters (name search) -->
+          <div style="margin-bottom:.65rem">
+            <input id="q" class="search-input" placeholder="Search model or collection" aria-label="Search models" />
+          </div>
 
-      <div class="cta">
-        <button class="btn" id="contactBtn">Contact</button>
-        <button class="btn primary" id="requestQuote">Request Quote</button>
-      </div>
-    </aside>
+          <!-- Category -->
+          <div class="filter-group" data-filter="category">
+            <button type="button" class="filter-toggle" aria-expanded="true">Category <span class="count-badge" data-group-count="category"></span></button>
+            <div class="filter-body" role="group" aria-label="Category options">
+              <label><input type="checkbox" name="category" value="New"> New <span class="count-badge" data-count-for="category:New"></span></label>
+              <label><input type="checkbox" name="category" value="Limited"> Limited Edition <span class="count-badge" data-count-for="category:Limited"></span></label>
+              <label><input type="checkbox" name="category" value="Divers"> Divers <span class="count-badge" data-count-for="category:Divers"></span></label>
+              <label><input type="checkbox" name="category" value="Presage"> Presage <span class="count-badge" data-count-for="category:Presage"></span></label>
+            </div>
+          </div>
 
-    <main class="content" id="content" tabindex="0">
-      <div class="bg-orb" aria-hidden="true"></div>
+          <!-- Case material -->
+          <div class="filter-group" data-filter="caseMaterial">
+            <button type="button" class="filter-toggle" aria-expanded="true">Case material <span class="count-badge" data-group-count="caseMaterial"></span></button>
+            <div class="filter-body" role="group" aria-label="Case material options">
+              <label><input type="checkbox" name="caseMaterial" value="Stainless steel"> Stainless steel <span class="count-badge" data-count-for="caseMaterial:Stainless steel"></span></label>
+              <label><input type="checkbox" name="caseMaterial" value="Titanium"> Titanium <span class="count-badge" data-count-for="caseMaterial:Titanium"></span></label>
+              <label><input type="checkbox" name="caseMaterial" value="Ceramic"> Ceramic <span class="count-badge" data-count-for="caseMaterial:Ceramic"></span></label>
+            </div>
+          </div>
 
-      <!-- Sales pane -->
-      <section class="pane" id="sales" role="tabpanel">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <!-- Band material -->
+          <div class="filter-group" data-filter="bandMaterial">
+            <button type="button" class="filter-toggle" aria-expanded="true">Band material <span class="count-badge" data-group-count="bandMaterial"></span></button>
+            <div class="filter-body" role="group" aria-label="Band material options">
+              <label><input type="checkbox" name="bandMaterial" value="Bracelet"> Bracelet <span class="count-badge" data-count-for="bandMaterial:Bracelet"></span></label>
+              <label><input type="checkbox" name="bandMaterial" value="Leather"> Leather <span class="count-badge" data-count-for="bandMaterial:Leather"></span></label>
+              <label><input type="checkbox" name="bandMaterial" value="Rubber"> Rubber <span class="count-badge" data-count-for="bandMaterial:Rubber"></span></label>
+            </div>
+          </div>
+
+          <!-- Movement -->
+          <div class="filter-group" data-filter="movement">
+            <button type="button" class="filter-toggle" aria-expanded="true">Movement <span class="count-badge" data-group-count="movement"></span></button>
+            <div class="filter-body" role="group" aria-label="Movement options">
+              <label><input type="checkbox" name="movement" value="Automatic"> Automatic <span class="count-badge" data-count-for="movement:Automatic"></span></label>
+              <label><input type="checkbox" name="movement" value="Quartz"> Quartz <span class="count-badge" data-count-for="movement:Quartz"></span></label>
+              <label><input type="checkbox" name="movement" value="Spring Drive"> Spring Drive <span class="count-badge" data-count-for="movement:Spring Drive"></span></label>
+            </div>
+          </div>
+
+          <!-- Case size -->
+          <div class="filter-group" data-filter="caseSize">
+            <button type="button" class="filter-toggle" aria-expanded="true">Case size <span class="count-badge" data-group-count="caseSize"></span></button>
+            <div class="filter-body" role="group" aria-label="Case size options">
+              <label><input type="checkbox" name="caseSize" value="36"> 36 mm <span class="count-badge" data-count-for="caseSize:36"></span></label>
+              <label><input type="checkbox" name="caseSize" value="39"> 39 mm <span class="count-badge" data-count-for="caseSize:39"></span></label>
+              <label><input type="checkbox" name="caseSize" value="42"> 42 mm <span class="count-badge" data-count-for="caseSize:42"></span></label>
+              <label><input type="checkbox" name="caseSize" value="44"> 44 mm <span class="count-badge" data-count-for="caseSize:44"></span></label>
+            </div>
+          </div>
+
+        </form>
+      </aside>
+
+      <!-- Results (right column) -->
+      <section class="results" aria-live="polite">
+        <div class="results-controls">
+          <div class="controls-left">
+            <div class="view-count" aria-hidden="true"><strong id="results-count">0</strong> results</div>
+            <div style="margin-left:0.6rem">
+              <label for="sort" class="sr-only">Sort by</label>
+              <select id="sort" name="sort" aria-label="Sort results">
+                <option value="relevance">Recommended</option>
+                <option value="new">New</option>
+                <option value="priceasc">Price: Low to high</option>
+                <option value="pricedesc">Price: High to low</option>
+              </select>
+            </div>
+          </div>
+
           <div>
-            <h2 style="margin:0">Shop Watches</h2>
-            <p class="small muted" style="margin-top:6px">Curated mechanical and quartz watches with international shipping.</p>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div class="badge">Best sellers</div>
-            <div class="badge">New arrivals</div>
+            <label for="per-page" class="sr-only">Results per page</label>
+            <select id="per-page" aria-label="Results per page">
+              <option value="9">9 / page</option>
+              <option value="12">12 / page</option>
+              <option value="18">18 / page</option>
+            </select>
           </div>
         </div>
 
-        <div class="grid" id="productsGrid" aria-live="polite">
-          <!-- cards injected by JS -->
+        <div id="status" class="result-meta" aria-live="polite"></div>
+
+        <div id="product-grid" class="product-grid" role="list" aria-label="Product results">
+          <!-- JS will render product cards here -->
         </div>
+
+        <nav class="pagination" aria-label="Pagination">
+          <button id="prev-page" class="page-btn" aria-label="Previous page">Prev</button>
+          <div class="page-info" aria-live="polite"><span id="page-info">Page 1</span></div>
+          <button id="next-page" class="page-btn" aria-label="Next page">Next</button>
+        </nav>
       </section>
+    </div>
+  </main>
 
-      <!-- Repair pane -->
-      <section class="pane" id="repair" role="tabpanel" hidden>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <div>
-            <h2 style="margin:0">Repair & Servicing</h2>
-            <p class="small muted" style="margin-top:6px">From battery swaps to full overhauls — expert certified watchmakers.</p>
-          </div>
-          <div class="badge">Book online</div>
-        </div>
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">© 2025 Seiko Watch Corporation — demo</div>
+  </footer>
 
-        <div class="services" id="services">
-          <div class="service">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7 4l4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 12h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="1.4"></circle></svg>
-            <div>
-              <strong>Full service</strong>
-              <div class="small muted">Cleaning, oiling, timing adjustment</div>
-            </div>
-          </div>
-
-          <div class="service">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12h18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 3v18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-            <div>
-              <strong>Battery & seals</strong>
-              <div class="small muted">Battery swap, pressure test, reseal</div>
-            </div>
-          </div>
-
-          <div class="service">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8 7v10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-            <div>
-              <strong>Crystal & strap</strong>
-              <div class="small muted">Refit, polish, and replacement</div>
-            </div>
-          </div>
-
-          <div class="service">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2l3 6 6 .5-5 3 2.5 6L12 16l-6.5 2.5L8 11 3 8.5 9 8 12 2z" stroke="currentColor" stroke-width="0.8" fill="rgba(255,255,255,0.02)"/></svg>
-            <div>
-              <strong>Restoration</strong>
-              <div class="small muted">Case refinish, dial repair, parts sourcing</div>
-            </div>
-          </div>
-
-        </div>
-
-        <div style="margin-top:14px;display:grid;grid-template-columns:1fr 340px;gap:12px;align-items:start">
-          <div>
-            <h3 style="margin:0 0 8px 0">How it works</h3>
-            <ol class="muted" style="margin:0;padding-left:18px">
-              <li>Request quote or drop-in</li>
-              <li>We inspect & provide estimate</li>
-              <li>Approve repair — we service and return</li>
-            </ol>
-          </div>
-
-          <div style="background:rgba(255,255,255,0.02);padding:12px;border-radius:10px">
-            <h4 style="margin:0 0 8px 0">Quick appointment</h4>
-            <label for="apptName">Name</label>
-            <input id="apptName" placeholder="Full name" />
-            <label for="apptPhone" style="margin-top:8px">Phone</label>
-            <input id="apptPhone" placeholder="Phone or email" />
-            <label for="apptWhen" style="margin-top:8px">Preferred day</label>
-            <input id="apptWhen" placeholder="e.g. 2025-12-05" />
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button class="btn" id="apptCancel">Cancel</button>
-              <button class="btn primary" id="apptSubmit">Book</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Requests pane -->
-      <section class="pane" id="requests" role="tabpanel" hidden>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <div>
-            <h2 style="margin:0">Requests & Quotes</h2>
-            <p class="small muted" style="margin-top:6px">Send us a request for custom work or a repair estimate.</p>
-          </div>
-          <div class="badge">Stored locally</div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 360px;gap:12px;align-items:start">
-          <div>
-            <div class="requests" id="requestsList" aria-live="polite">
-              <!-- requests injected here -->
-            </div>
-          </div>
-
-          <aside style="background:rgba(255,255,255,0.02);padding:12px;border-radius:10px">
-            <h4 style="margin-top:0">New Request</h4>
-            <label for="rqName">Name</label>
-            <input id="rqName" placeholder="Your name" />
-            <label for="rqContact" style="margin-top:8px">Contact</label>
-            <input id="rqContact" placeholder="Email or phone" />
-            <label for="rqType" style="margin-top:8px">Type</label>
-            <select id="rqType"><option>Repair</option><option>Custom build</option><option>Part sourcing</option></select>
-            <label for="rqMsg" style="margin-top:8px">Message</label>
-            <textarea id="rqMsg" rows="4" placeholder="Describe what you need..."></textarea>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button class="btn" id="rqClear">Clear</button>
-              <button class="btn primary" id="rqSend">Send request</button>
-            </div>
-          </aside>
-        </div>
-      </section>
-
-    </main>
-  </div>
-
+  <!-- ===========================
+       Inline app.js — single file
+       =========================== -->
   <script>
-    // --- Data (sample products) ---
-    const products = [
-      {id:1,name:"Astel Diver 200m",desc:"Automatic, sapphire, 40mm stainless",price:489,tag:"Diver"},
-      {id:2,name:"Meridian Chrono",desc:"Chronograph, 42mm, exhibition caseback",price:799,tag:"Chrono"},
-      {id:3,name:"Nocturne Minimal",desc:"Quartz, thin case, leather strap",price:149,tag:"Classic"},
-      {id:4,name:"Orbit GMT",desc:"GMT complication, 39mm brushed",price:639,tag:"GMT"},
-      {id:5,name:"Atlas Pilot",desc:"Large crown, luminous, pilot style",price:359,tag:"Pilot"},
-      {id:6,name:"Cobalt Dress",desc:"Blue dial, applied indices, slim",price:299,tag:"Dress"}
+  (function(){
+    'use strict';
+
+    /* --------------------------
+       Sample product dataset
+       -------------------------- */
+    const PRODUCTS = [
+      { id: "S1", name: "Prospex Diver 200m", collection:"Prospex", category:"Divers", caseMaterial:"Stainless steel", bandMaterial:"Bracelet", movement:"Automatic", caseSize:44, price:760, image:svgDataUrl("Prospex Diver 200m","#0b4a6f","#071014"), url:"#"},
+      { id: "S2", name: "Presage Cocktail Time", collection:"Presage", category:"Presage", caseMaterial:"Stainless steel", bandMaterial:"Leather", movement:"Automatic", caseSize:39, price:450, image:svgDataUrl("Presage Cocktail","#6a3b7a"), url:"#"},
+      { id: "S3", name: "Astron GPS Solar", collection:"Astron", category:"New", caseMaterial:"Titanium", bandMaterial:"Bracelet", movement:"Quartz", caseSize:42, price:2200, image:svgDataUrl("Astron GPS","#0a2938"), url:"#"},
+      { id: "S4", name: "Prospex Turtle", collection:"Prospex", category:"Divers", caseMaterial:"Stainless steel", bandMaterial:"Rubber", movement:"Automatic", caseSize:44, price:520, image:svgDataUrl("Prospex Turtle","#1f3f4a"), url:"#"},
+      { id: "S5", name: "Presage Enamel", collection:"Presage", category:"Limited", caseMaterial:"Stainless steel", bandMaterial:"Leather", movement:"Automatic", caseSize:39, price:1250, image:svgDataUrl("Presage Enamel","#4a2b2b"), url:"#"},
+      { id: "S6", name: "Seiko 5 Sports", collection:"Seiko 5", category:"New", caseMaterial:"Stainless steel", bandMaterial:"Bracelet", movement:"Automatic", caseSize:42, price:295, image:svgDataUrl("Seiko 5 Sports","#2b5f3c"), url:"#"},
+      { id: "S7", name: "Grand Seiko Elegance", collection:"Grand Seiko", category:"Limited", caseMaterial:"Ceramic", bandMaterial:"Leather", movement:"Spring Drive", caseSize:39, price:6800, image:svgDataUrl("Grand Seiko","#2b2b5f"), url:"#"},
+      { id: "S8", name: "Prospex Solar Chrono", collection:"Prospex", category:"New", caseMaterial:"Titanium", bandMaterial:"Bracelet", movement:"Quartz", caseSize:44, price:620, image:svgDataUrl("Prospex Chrono","#123c4a"), url:"#"},
+      { id: "S9", name: "Diver Classic 36", collection:"Diver Classic", category:"Divers", caseMaterial:"Stainless steel", bandMaterial:"Bracelet", movement:"Automatic", caseSize:36, price:410, image:svgDataUrl("Diver Classic","#234b6b"), url:"#"},
+      { id: "S10", name: "Elegance Slim 39", collection:"Elegance", category:"Presage", caseMaterial:"Stainless steel", bandMaterial:"Leather", movement:"Quartz", caseSize:39, price:380, image:svgDataUrl("Elegance Slim","#4b2b3a"), url:"#"},
+      { id: "S11", name: "Limited Edition Blue", collection:"Limited", category:"Limited", caseMaterial:"Ceramic", bandMaterial:"Leather", movement:"Automatic", caseSize:42, price:2890, image:svgDataUrl("Limited Blue","#0a2b4a"), url:"#"},
+      { id: "S12", name: "Titanium Field 42", collection:"Field", category:"New", caseMaterial:"Titanium", bandMaterial:"Rubber", movement:"Quartz", caseSize:42, price:520, image:svgDataUrl("Titanium Field","#2a3f2b"), url:"#"},
+      { id: "S13", name: "Presage White Dial", collection:"Presage", category:"Presage", caseMaterial:"Stainless steel", bandMaterial:"Leather", movement:"Automatic", caseSize:39, price:720, image:svgDataUrl("Presage White","#c4c4c4"), url:"#"},
+      { id: "S14", name: "Seiko Minimal 36", collection:"Seiko 5", category:"New", caseMaterial:"Stainless steel", bandMaterial:"Bracelet", movement:"Quartz", caseSize:36, price:180, image:svgDataUrl("Minimal 36","#556b5f"), url:"#"},
+      { id: "S15", name: "Deep Blue 44", collection:"Prospex", category:"Divers", caseMaterial:"Stainless steel", bandMaterial:"Rubber", movement:"Automatic", caseSize:44, price:980, image:svgDataUrl("Deep Blue","#023e6a"), url:"#"}
     ];
 
-    // --- Simple tab switching ---
-    const tabs = document.querySelectorAll('.tab');
-    const panes = document.querySelectorAll('.pane');
-    tabs.forEach(t=>t.addEventListener('click', ()=>{
-      tabs.forEach(x=>{x.classList.remove('active');x.setAttribute('aria-selected','false')});
-      t.classList.add('active');t.setAttribute('aria-selected','true');
-      const which = t.dataset.tab;
-      panes.forEach(p=>{p.hidden = p.id !== which});
-    }));
+    /* ---------------------------------------------------------
+       Utilities
+       - svgDataUrl: simple SVG placeholder generator (data URL)
+       - debounce: classic
+       --------------------------------------------------------- */
+    function svgDataUrl(text, bg="#222", fg="#fff"){
+      const w=800,h=600,esc = s => String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}' viewBox='0 0 ${w} ${h}'>
+        <rect width='100%' height='100%' fill='${bg}'/>
+        <g transform='translate(32,40)'>
+          <text x='0' y='56' font-family='Inter, system-ui' font-weight='700' font-size='48' fill='${fg}'>${esc(text)}</text>
+        </g>
+      </svg>`;
+      return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+    }
 
-    // --- Inject product cards ---
-    const grid = document.getElementById('productsGrid');
-    function createCard(p){
-      const card = document.createElement('article');
-      card.className = 'card';
-      card.setAttribute('tabindex','0');
-      card.innerHTML = `
-        <div class="watch-visual" aria-hidden="true">
-          <svg width="120" height="120" viewBox="0 0 120 120"><defs><linearGradient id="g${p.id}" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.12"/><stop offset="1" stop-color="#000" stop-opacity="0.06"/></linearGradient></defs>
-            <circle cx="60" cy="60" r="46" fill="url(#g${p.id})" stroke="rgba(255,255,255,0.04)" stroke-width="2" />
-            <circle cx="60" cy="60" r="36" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="1.2" />
-            <rect x="56" y="22" width="8" height="12" rx="2" fill="rgba(255,209,102,0.9)" transform="rotate(30 60 60)" />
-          </svg>
-        </div>
-        <div>
-          <div style="display:flex;justify-content:space-between;align-items:start;gap:10px">
-            <div>
-              <div class="watch-name">${p.name}</div>
-              <div class="small muted">${p.desc}</div>
+    function debounce(fn, ms=180){
+      let t;
+      return (...args)=>{ clearTimeout(t); t = setTimeout(()=>fn(...args), ms); };
+    }
+
+    /* ------------------------
+       State & element refs
+       ------------------------ */
+    let state = {
+      all: PRODUCTS.slice(),
+      filtered: [],
+      page: 1,
+      perPage: 9,
+      sort: 'relevance',
+      q: ''
+    };
+
+    const DOM = {
+      grid: document.getElementById('product-grid'),
+      form: document.getElementById('filters-form'),
+      resultsCount: document.getElementById('results-count'),
+      status: document.getElementById('status'),
+      sort: document.getElementById('sort'),
+      perPage: document.getElementById('per-page'),
+      q: document.getElementById('q'),
+      pageInfo: document.getElementById('page-info'),
+      prevBtn: document.getElementById('prev-page'),
+      nextBtn: document.getElementById('next-page'),
+      clearAll: document.getElementById('clear-all')
+    };
+
+    /* ------------------------
+       Init
+       ------------------------ */
+    function init(){
+      // initial bind
+      bindUI();
+      // parse URL state if present
+      readURL();
+      // initial filter pass
+      applyFilters();
+      // init counts UI
+      updateAllCounts();
+      // make filter groups collapsible
+      document.querySelectorAll('.filter-toggle').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const expanded = btn.getAttribute('aria-expanded') === 'true';
+          btn.setAttribute('aria-expanded', String(!expanded));
+          const body = btn.nextElementSibling;
+          if(body) body.style.display = !expanded ? 'block' : 'none';
+        });
+      });
+    }
+
+    /* ------------------------
+       UI bindings
+       ------------------------ */
+    function bindUI(){
+      // form interactions: checkboxes, selects
+      DOM.form.addEventListener('change', debounce(e=>{
+        if(e.target && e.target.name){
+          state.page = 1;
+          applyFilters();
+        }
+      }, 150));
+
+      DOM.sort.addEventListener('change', ()=>{ state.sort = DOM.sort.value; applyFilters(); });
+      DOM.perPage.addEventListener('change', ()=>{ state.perPage = parseInt(DOM.perPage.value,10) || 9; state.page = 1; render(); });
+      DOM.q.addEventListener('input', debounce((e)=>{ state.q = e.target.value.trim(); state.page = 1; applyFilters(); },220));
+
+      DOM.prevBtn.addEventListener('click', ()=>{ if(state.page>1){ state.page--; render(); scrollToTop(); }});
+      DOM.nextBtn.addEventListener('click', ()=>{ const max = Math.ceil(state.filtered.length/state.perPage); if(state.page<max){ state.page++; render(); scrollToTop(); }});
+      DOM.clearAll.addEventListener('click', clearAllFilters);
+
+      // keyboard: enter on search toggles
+      document.querySelector('.search-toggle').addEventListener('click', ()=>{
+        const s = document.getElementById('q');
+        s.focus();
+        s.select();
+      });
+
+      // allow clicking card to be keyboard friendly
+      DOM.grid.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter'){
+          const a = e.target.closest('a');
+          if(a) a.click();
+        }
+      });
+
+      // capture popstate to restore state
+      window.addEventListener('popstate', (e)=>{ readURL(); applyFilters(false); });
+    }
+
+    /* ------------------------
+       Filter logic
+       - reads form, filters dataset, sorts, paginates
+       ------------------------ */
+    function getActiveFilters(){
+      const fd = new FormData(DOM.form);
+      const map = {};
+      for(const [k,v] of fd.entries()){
+        if(!map[k]) map[k]=new Set();
+        map[k].add(v);
+      }
+      // convert sets to arrays
+      Object.keys(map).forEach(k=>map[k]=Array.from(map[k]));
+      return map;
+    }
+
+    function applyFilters(pushURL = true){
+      const filters = getActiveFilters();
+      const q = state.q && state.q.toLowerCase();
+      // filter
+      state.filtered = state.all.filter(p=>{
+        // search text
+        if(q){
+          const composite = `${p.name} ${p.collection} ${p.category}`.toLowerCase();
+          if(!composite.includes(q)) return false;
+        }
+        for(const key in filters){
+          if(!filters[key].length) continue;
+          const val = filters[key];
+          // caseSize in dataset is number — compare strings and numbers
+          if(!val.some(v => String(p[key]) === String(v))) return false;
+        }
+        return true;
+      });
+
+      // sort
+      switch(state.sort){
+        case 'priceasc': state.filtered.sort((a,b)=>a.price - b.price); break;
+        case 'pricedesc': state.filtered.sort((a,b)=>b.price - a.price); break;
+        case 'new': state.filtered.sort((a,b)=> (a.category=== 'New' ? -1 : 1)); break;
+        default: // relevance / default
+          state.filtered.sort((a,b)=>a.name.localeCompare(b.name));
+      }
+
+      // update counts and UI
+      updateAllCounts();
+      state.page = Math.min(state.page, Math.max(1, Math.ceil(state.filtered.length / state.perPage)));
+      render();
+      if(pushURL) pushStateToURL();
+    }
+
+    /* ------------------------
+       Render UI
+       ------------------------ */
+    function render(){
+      DOM.grid.innerHTML = '';
+      const total = state.filtered.length;
+      DOM.resultsCount.textContent = total;
+      DOM.status.textContent = total ? `${total} watches matching` : 'No watches match your filters. Try clearing filters.';
+      const start = (state.page-1)*state.perPage;
+      const end = start + state.perPage;
+      const pageSlice = state.filtered.slice(start, end);
+
+      if(pageSlice.length === 0){
+        DOM.grid.innerHTML = `<div class="empty" role="status">No results</div>`;
+      } else {
+        const frag = document.createDocumentFragment();
+        pageSlice.forEach(p => {
+          const item = document.createElement('article');
+          item.setAttribute('role','listitem');
+          item.className = 'product-card fade-up show';
+          item.innerHTML = `
+            <a class="thumb" href="${p.url}" aria-label="${p.name}">
+              <img src="${p.image}" alt="${p.name}" loading="lazy" width="800" height="600">
+            </a>
+            <div class="meta">
+              <div class="label">${escapeHtml(p.collection)} • ${escapeHtml(p.category)}</div>
+              <div class="title">${escapeHtml(p.name)}</div>
+              <div class="price">${formatPrice(p.price)}</div>
             </div>
-            <div class="price">$${p.price}</div>
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn">Details</button>
-          <button class="btn primary" data-buy="${p.id}">Buy</button>
-        </div>
-      `;
+            <div class="card-actions">
+              <button class="btn" type="button" aria-label="Quick view ${escapeHtml(p.name)}">Quick view</button>
+              <a class="btn" href="${p.url}" aria-label="Open ${escapeHtml(p.name)}">View</a>
+            </div>`;
+          frag.appendChild(item);
+        });
+        DOM.grid.appendChild(frag);
+        // lazy enhancement: observe images to unblur or show animation
+        // (Using loading="lazy" already)
+      }
 
-      // 3D tilt effect per card
-      card.addEventListener('mousemove', (e)=>{
-        const r = card.getBoundingClientRect();
-        const cx = r.left + r.width/2;
-        const cy = r.top + r.height/2;
-        const dx = (e.clientX - cx) / (r.width/2);
-        const dy = (e.clientY - cy) / (r.height/2);
-        const tiltX = (-dy * 8).toFixed(2);
-        const tiltY = (dx * 10).toFixed(2);
-        const translateZ = 24;
-        card.style.transform = `translateY(-6px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateZ(${translateZ}px)`;
+      // pagination ui
+      const pages = Math.max(1, Math.ceil(total / state.perPage));
+      DOM.pageInfo.textContent = `Page ${state.page} of ${pages}`;
+      DOM.prevBtn.disabled = state.page <= 1;
+      DOM.nextBtn.disabled = state.page >= pages;
+    }
+
+    /* ------------------------
+       Filter counts (live)
+       - show counts per option reflecting current base set (ignoring that option)
+       - also show group totals
+       ------------------------ */
+    function updateAllCounts(){
+      // create counts from currently filtered base (but based on all products so users see availability)
+      // We'll show two layers: counts for option if it were applied on top of current query (helpful)
+      const active = getActiveFilters();
+      const q = state.q && state.q.toLowerCase();
+
+      // helper that counts for a specific key:value applying other active filters but ignoring the inspected key itself
+      function countFor(key, value){
+        return state.all.filter(p=>{
+          // text filter still applied
+          if(q){
+            const composite = `${p.name} ${p.collection} ${p.category}`.toLowerCase();
+            if(!composite.includes(q)) return false;
+          }
+          for(const k in active){
+            if(k === key) continue; // ignore same group
+            if(active[k].length && !active[k].includes(String(p[k]))) return false;
+          }
+          // now test the inspected option
+          return String(p[key]) === String(value);
+        }).length;
+      }
+
+      // update per-option counts
+      document.querySelectorAll('[data-count-for]').forEach(el=>{
+        const keyval = el.getAttribute('data-count-for'); // e.g. caseMaterial:Stainless steel
+        if(!keyval) return;
+        const [k,v] = keyval.split(':');
+        const c = countFor(k, v);
+        el.textContent = c ? `(${c})` : '(0)';
       });
-      card.addEventListener('mouseleave', ()=>{card.style.transform = ''});
 
-      // simple buy interaction
-      card.querySelector('[data-buy]')?.addEventListener('click', ()=>{
-        alert(`Added ${p.name} — $${p.price} to cart (demo).`);
+      // update group totals (how many items would remain if ANY option in group selected)
+      document.querySelectorAll('[data-group-count]').forEach(el=>{
+        const key = el.getAttribute('data-group-count');
+        const counts = Array.from(document.querySelectorAll(`[data-count-for^="${key}:"]`)).map(x=>{
+          const txt = x.textContent || '';
+          const num = parseInt(txt.replace(/[^\d]/g,''),10) || 0;
+          return num;
+        });
+        const total = counts.reduce((s,n)=>s+n,0);
+        el.textContent = total ? `(${total})` : '(0)';
       });
-
-      return card;
     }
 
-    products.forEach(p=>grid.appendChild(createCard(p)));
-
-    // --- Simple request storage ---
-    const reqList = document.getElementById('requestsList');
-    const rqName = document.getElementById('rqName');
-    const rqContact = document.getElementById('rqContact');
-    const rqType = document.getElementById('rqType');
-    const rqMsg = document.getElementById('rqMsg');
-
-    function loadRequests(){
-      reqList.innerHTML='';
-      const data = JSON.parse(localStorage.getItem('helios_requests')||'[]').reverse();
-      if(!data.length){reqList.innerHTML = '<div class="muted">No requests yet — submit one from the form.</div>';return}
-      data.forEach((r,idx)=>{
-        const el = document.createElement('div');el.className='req';
-        el.innerHTML = `<strong>${r.name} <span class="small muted">(${r.type})</span></strong><div class="small muted">${r.contact}</div><div style="margin-top:6px">${escapeHtml(r.msg)}</div>`;
-        reqList.appendChild(el);
-      })
+    /* ------------------------
+       Helpers: clear filters, URL sync
+       ------------------------ */
+    function clearAllFilters(){
+      // uncheck all checkboxes, clear search, reset
+      DOM.form.querySelectorAll('input[type="checkbox"]').forEach(cb=>cb.checked=false);
+      DOM.q.value = '';
+      state.q = '';
+      state.page = 1;
+      applyFilters();
+      // announce
+      DOM.status.textContent = 'Filters cleared.';
+      updateAllCounts();
     }
-    function saveRequest(){
-      const r = {name:rqName.value||'Anonymous',contact:rqContact.value||'—',type:rqType.value,msg:rqMsg.value||'—',created:Date.now()};
-      const current = JSON.parse(localStorage.getItem('helios_requests')||'[]');
-      current.push(r);localStorage.setItem('helios_requests', JSON.stringify(current));
-      loadRequests();
-      rqName.value='';rqContact.value='';rqType.value='Repair';rqMsg.value='';
-      alert('Request saved locally — in a real site this would be sent to the server.');
+
+    function pushStateToURL(){
+      const params = new URLSearchParams();
+      // collect selected filters
+      const fd = new FormData(DOM.form);
+      for(const [k,v] of fd.entries()){
+        params.append(k,v);
+      }
+      if(state.q) params.set('q', state.q);
+      if(state.sort && state.sort !== 'relevance') params.set('sort', state.sort);
+      if(state.perPage && state.perPage !== 9) params.set('per', state.perPage);
+      if(state.page && state.page > 1) params.set('page', state.page);
+      const url = `${location.pathname}?${params.toString()}`;
+      history.replaceState({}, '', url);
     }
-    function escapeHtml(str){return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}
 
-    document.getElementById('rqSend').addEventListener('click', saveRequest);
-    document.getElementById('rqClear').addEventListener('click', ()=>{rqName.value='';rqContact.value='';rqMsg.value='';});
-
-    // appointment demo
-    document.getElementById('apptSubmit').addEventListener('click', ()=>{
-      const n = document.getElementById('apptName').value||'Visitor';
-      const c = document.getElementById('apptPhone').value||'—';
-      const when = document.getElementById('apptWhen').value||'—';
-      alert(`Thanks ${n}! We received your booking request for ${when}. We'll contact ${c}.`);
-    });
-    document.getElementById('apptCancel').addEventListener('click', ()=>{document.getElementById('apptName').value='';document.getElementById('apptPhone').value='';document.getElementById('apptWhen').value='';});
-
-    // contact & request quick actions
-    document.getElementById('contactBtn').addEventListener('click', ()=>{
-      alert('Call us: +44 20 7946 0958 — or email hello@helios.example (demo).');
-    });
-    document.getElementById('requestQuote').addEventListener('click', ()=>{
-      document.querySelector('.tab[data-tab="requests"]').click();
-      document.getElementById('rqName').focus();
-    });
-
-    // initial load requests
-    loadRequests();
-
-    // subtle 3D parallax for the whole app based on mouse
-    const app = document.getElementById('app');
-    document.addEventListener('mousemove', (e)=>{
-      const r = app.getBoundingClientRect();
-      const cx = r.left + r.width/2;
-      const cy = r.top + r.height/2;
-      const dx = (e.clientX - cx) / (r.width/2);
-      const dy = (e.clientY - cy) / (r.height/2);
-      app.style.transform = `rotateX(${(-dy*3).toFixed(2)}deg) rotateY(${(dx*3).toFixed(2)}deg)`;
-    });
-
-    // keyboard accessible tab switching (Left/Right)
-    const tabList = document.querySelector('[role=tablist]');
-    tabList.addEventListener('keydown', (e)=>{
-      const keys = ['ArrowLeft','ArrowRight','Home','End'];
-      if(!keys.includes(e.key)) return;
-      e.preventDefault();
-      const current = document.activeElement;
-      const items = Array.from(tabList.querySelectorAll('[role=tab]'));
-      let idx = items.indexOf(current);
-      if(e.key==='ArrowLeft') idx = (idx-1+items.length)%items.length;
-      if(e.key==='ArrowRight') idx = (idx+1)%items.length;
-      if(e.key==='Home') idx = 0;
-      if(e.key==='End') idx = items.length-1;
-      items[idx].focus();items[idx].click();
-    });
-
-    // small accessibility: focus outline style
-    document.addEventListener('keydown', (e)=>{document.documentElement.style.setProperty('--show-focus','1')}, {once:true});
-
-    // make sure panes have proper aria-hidden
-    function updateAria(){
-      panes.forEach(p=>{p.setAttribute('aria-hidden', p.hidden)});
+    function readURL(){
+      const params = new URLSearchParams(location.search);
+      // set checkboxes
+      DOM.form.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
+        const key = cb.name;
+        const vals = params.getAll(key);
+        cb.checked = vals.includes(cb.value);
+      });
+      // q
+      const q = params.get('q') || '';
+      DOM.q.value = q;
+      state.q = q;
+      // sort
+      const sort = params.get('sort') || 'relevance';
+      DOM.sort.value = sort;
+      state.sort = sort;
+      // per
+      const per = parseInt(params.get('per'),10) || 9;
+      DOM.perPage.value = per;
+      state.perPage = per;
+      // page
+      const page = parseInt(params.get('page'),10) || 1;
+      state.page = page;
     }
-    const observer = new MutationObserver(updateAria);
-    panes.forEach(p=>observer.observe(p,{attributes:true,attributeFilter:['hidden']}));
-    updateAria();
 
+    /* ------------------------
+       small utility functions
+       ------------------------ */
+    function formatPrice(n){ return n ? '€' + n.toLocaleString() : '—'; }
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
+    function scrollToTop(){ window.scrollTo({top: document.querySelector('.results').offsetTop - 20, behavior:'smooth'}); }
+
+    // initialize
+    init();
+
+  })();
   </script>
 </body>
 </html>
